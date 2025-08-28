@@ -1,7 +1,7 @@
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { User } from '../models/user.model.js';
-import { on } from 'nodemon';
+// import { on } from 'nodemon';
 import UplodeonCloudnary from '../utils/cloudnarry.js';
 import{ApiResponse} from '../utils/ApiResponse.js'
 
@@ -35,9 +35,9 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User already exists with this email or username")
     }
 
-    const avtarlocal = req.file?.avatar[0]?.path
-    const coverImagelocal = req.file?.coverImage[0]?.path
-
+    const avtarlocal = req.files?.avatar[0]?.path
+    const coverImagelocal = req.files?.coverImage[0]?.path
+ 
     if (!avtarlocal) {
         throw new ApiError(400, "Avatar is required")
     }
@@ -49,13 +49,13 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Error while uploding avatar to cloudnary")
     }
 
-    const user = User.create({
+    const user = await User.create({
         fullname,
         username,
         email,
         password,
         avatar: avater.url,
-        coverimage: coverImage?.url
+        coverImage: coverImage?.url || ""
     })
 
 

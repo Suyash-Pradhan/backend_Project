@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from 'bcrypt'
-import { JsonWebTokenError } from "jsonwebtoken";
+import jwt from 'jsonwebtoken'
 
 
 
@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-    coverimage:{
+    coverImage:{
         type:String,
     },
     watchHistory:{
@@ -84,4 +84,4 @@ UserSchema.methods.generateRefreshToken = function(){
     )
 }
 
-export const User = mongoose.model('user','UserSchema')
+export const User = mongoose.model('user',UserSchema)
