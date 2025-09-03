@@ -3,7 +3,8 @@ import { ApiError } from '../utils/ApiError.js';
 import { User } from '../models/user.model.js';
 // import { on } from 'nodemon';
 import UplodeonCloudnary from '../utils/cloudnarry.js';
-import { ApiResponse } from '../utils/ApiResponse.js'
+import { ApiResponse } from '../utils/ApiResponse.js';
+import jwt from 'jsonwebtoken';
 
 const generateAccessAndRefreshToken = async (userid) => {
     try {
@@ -152,4 +153,41 @@ const logoutuser = asyncHandler(async (req, res) => {
 }
 )
 
-export { registerUser, loginUser, logoutuser }
+const refreshacessToken = asyncHandler(async (req, res) => {
+    const incomingRefreshtoken = req.cookies.refreshtoken || req.header("Authorization")?.replace("Bearer ", "")
+    if (!incomingRefreshtoken) {
+        throw new ApiError(401, "Not authorized , no token")
+    }
+   try {
+     const decoded = jwt.verify(incomingRefreshtoken,process.env.REFRESH_TOKEN_SECRET);
+     if(!decoded){
+         throw new ApiError(401, "Not authorized , token failed")
+     }
+ 
+     const user = await User.findById(decoded._id)
+     if(!user || user.refreshtoken !== incomingRefreshtoken){
+         throw new ApiError(401, "Not authorized , token failed")
+     }
+ 
+     const options = {
+         httpOnly: true,
+         secure: true,
+     }
+     const {acesstoken,refreshtoken} = await generateAccessAndRefreshToken(user._id)
+ 
+     return res.status(200)
+     .cookie("refreshToken", refreshtoken, options)
+     .cookie("accessToken", acesstoken, options)
+     .json(new ApiResponse(200,
+         {
+             acesstoken, refreshtoken
+         },
+         "token refreshed successfully"
+     ))
+   } catch (error) {
+    throw new ApiError(401, "Not authorized , token failed")
+   }
+})
+
+
+export { registerUser, loginUser, logoutuser,refreshacessToken }
