@@ -261,6 +261,60 @@ const changeCoverImage = asyncHandler(async (req, res) => {
 const getcurrentuser = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, req.user, "Current user fetched successfully"))
 })
+
+const getchannelDetails = asyncHandler(async (req, res) => {
+    const username = req.params;
+
+    if (!username) {
+        throw new ApiError(400, "username is required")
+    }
+
+    await User.aggregate([
+        { $match: { username: username?.lowercase() } },
+        { $lookup: { from: 'subscription', localField: '_id', foreignField: 'channel', as: 'subscribers' } },
+        { $lookup: { from: 'subscription', localField: '_id', foreignField: 'subscriber', as: 'subscribedTo' } },
+        {
+            $addFields: {
+                subscriberscount: {
+                    $size: '$subscribers'
+                },
+                subscribedToCount: {
+                    $size: '$subscribedTo'
+                },
+                isSubscribed: {
+                    $cond: {
+                        if: { $in: [req.user._id, '$subscribers.subscriber'] },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                fullname: 1,
+                username: 1,
+                subscriberscount: 1,
+                subscribedToCount: 1,
+                isSubscribed: 1,
+                avatar: 1,
+                coverImage: 1,
+                email: 1
+            }
+        }
+    ])
+     if (!channel?.length) {
+        throw new ApiError(404, "channel does not exists")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, channel[0], "User channel fetched successfully")
+    )
+
+
+})
 export {
     registerUser,
     loginUser,
