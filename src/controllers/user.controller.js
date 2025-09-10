@@ -12,7 +12,7 @@ const generateAccessAndRefreshToken = async (userid) => {
         const acesstoken = user.generateAccessToken()
         const refreshtoken = user.generateRefreshToken()
 
-        user.refreshtoken = refreshtoken
+        user.refreshToken = refreshtoken
         await user.save({ ValidityState: false })
 
         return { acesstoken, refreshtoken }
@@ -33,7 +33,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
     const { fullname, username, email, password } = req.body;
-    console.log("email", email);
+ 
 
     if (
         [fullname, username, email, password].some((fields) => fields?.trim() === "")
@@ -98,7 +98,6 @@ const loginUser = asyncHandler(async (req, res) => {
     //send cookie
 
     const { username, email, password } = req.body;
-    console.log("req.body", req.body);
 
     if (!(email || username)) {
         throw new ApiError(400, "Email or username is required")
@@ -138,7 +137,7 @@ const logoutuser = asyncHandler(async (req, res) => {
     //get user id from req.user
     const user = await User.findByIdAndUpdate(
         req.user._id,
-        { $set: { refreshtoken: undefined } },
+        { $set: { refreshToken: null } },
         { new: true }
     )
     const options = {
@@ -147,26 +146,32 @@ const logoutuser = asyncHandler(async (req, res) => {
     }
 
     return res.status(200)
-        .clearcookie("refreshToken", options)
-        .clearcookie("accessToken", options)
-        .json(ApiResponse(200, {}, 'Logout successfull'))
+        .clearCookie("refreshToken", options)
+        .clearCookie("accessToken", options)
+        .json(new ApiResponse(200, {}, 'Logout successfull'))
 }
 )
 
 const refreshacessToken = asyncHandler(async (req, res) => {
-    const incomingRefreshtoken = req.cookies.refreshtoken || req.header("Authorization")?.replace("Bearer ", "")
+    const incomingRefreshtoken = req.cookies.refreshToken || req.header("Authorization")?.replace("Bearer ", "")
+
     if (!incomingRefreshtoken) {
         throw new ApiError(401, "Not authorized , no token")
     }
     try {
         const decoded = jwt.verify(incomingRefreshtoken, process.env.REFRESH_TOKEN_SECRET);
+
         if (!decoded) {
             throw new ApiError(401, "Not authorized token failed")
         }
 
         const user = await User.findById(decoded._id)
-        if (!user || user.refreshtoken !== incomingRefreshtoken) {
-            throw new ApiError(401, "Not authorized token failed")
+        if (!user) {
+            console.log("user", user);
+            throw new ApiError(401, "Invalid token user not found")
+        }
+        if (user?.refreshToken !== incomingRefreshtoken) {
+            throw new ApiError(401, "token Expired or invalid")
         }
 
         const options = {
@@ -226,7 +231,8 @@ const chnageuserDetails = asyncHandler(async (req, res) => {
 })
 
 const changeAvatar = asyncHandler(async (req, res) => {
-    const localAvtarPath = req.files?.path
+    const localAvtarPath = req.file?.path
+
     if (!localAvtarPath) {
         throw new ApiError(400, "Avatar is required")
     }
@@ -242,7 +248,7 @@ const changeAvatar = asyncHandler(async (req, res) => {
 
 })
 const changeCoverImage = asyncHandler(async (req, res) => {
-    const localCoverImagePath = req.files?.path
+    const localCoverImagePath = req.file?.path
     if (!localCoverImagePath) {
         throw new ApiError(400, "Avatar is required")
     }
@@ -379,4 +385,6 @@ export {
     changeAvatar,
     changeCoverImage,
     getcurrentuser,
+    getchannelDetails,
+    getWatchHistory,
 }

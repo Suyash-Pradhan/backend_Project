@@ -23,10 +23,10 @@ const publishAVideo = asyncHandler(async (req, res) => {
     if (!videoFile) {
         throw new ApiError(400, 'Video file is required')
     }
-    if (!thumbnail) {
+    if (!thumbnailFile) {
         throw new ApiError(400, 'Thumbnail is required')
     }
-
+// console.log("info",videoFile, thumbnailFile)
     const CloudnaryLinkVideo = await UplodeonCloudnary(videoFile)
     const CloudnaryLinkThumbnail = await UplodeonCloudnary(thumbnailFile)
 
