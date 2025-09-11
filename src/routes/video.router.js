@@ -17,8 +17,8 @@ router.route('/uplode-video').post(verifyToken, upload.fields([
     }
 ]), publishAVideo)
 
-router.route('/:videoId').get(verifyToken, getVideoById)
-router.route('/:videoId').patch(verifyToken,upload.single('thumbnail'), updateVideo)
+router.route('/getvideo/:videoId').get(verifyToken, getVideoById)
+router.route('/update-video/:videoId').patch(verifyToken,upload.single('thumbnail'), updateVideo)
 router.route('/').get(verifyToken, getAllVideos)
 
 export default router
