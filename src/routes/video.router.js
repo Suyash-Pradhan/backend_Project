@@ -20,5 +20,6 @@ router.route('/uplode-video').post(verifyToken, upload.fields([
 router.route('/getvideo/:videoId').get(verifyToken, getVideoById)
 router.route('/update-video/:videoId').patch(verifyToken,upload.single('thumbnail'), updateVideo)
 router.route('/').get(verifyToken, getAllVideos)
+router.route('/delete-video/:videoId').delete(verifyToken, deleteVideo)
 
 export default router
