@@ -40,7 +40,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
     const uploadedVideo = await Video.create({
         title: title,
         videoFile: CloudnaryLinkVideo.url,
-        thumbnail: CloudnaryLinkThumbnail.url,
+        thumbnail: CloudnaryLinkThumbnail.secure_url,
         desc: description,
         duration: CloudnaryLinkVideo.duration,
         owner: req.user._id

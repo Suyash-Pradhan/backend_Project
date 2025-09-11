@@ -1,7 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs, { fstatSync } from 'fs';
 import { ApiError } from '../utils/ApiError.js';
-import { rejects } from 'assert';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -18,30 +17,28 @@ const UplodeonCloudnary = async (filepath) => {
 
         const stats = fs.statSync(filepath)
         const fileSizeinMB = stats.size / (1024 * 1024)
-        let response;
+
         if (fileSizeinMB > 100) {
-            console.log("Large file detected");
-            const uploadResult = await new Promise((resolve,rejects)=>{
-
-                response =  cloudinary.uploader.upload_large(filepath, {
-                    resource_type: "auto",
-                    chunk_size: 6000000
-                });
-
-                response.on('end', (data) => {
-                    resolve(data);
-                })
-                response.on('error', (data) => {
-                    rejects(data);
-                })
-            })
-            console.log("video ke length duration", uploadResult);
+            throw new ApiError(400, 'File limit exceed')
         }
-        else {
 
-            response = await cloudinary.uploader.upload(filepath, { resource_type: "auto" });
+        const response = await cloudinary.uploader.upload(filepath, {
+            resource_type: "auto",
+            // chunk_size: 6000000
+        }, (error, result) => {
+            if (error) {
+                console.error("Upload large error:", error);
 
-        }
+            }
+            else {
+                console.log(" File uploded successfuly");
+
+            };
+        })
+
+        console.log("video ke length duration", response);
+
+
         // console.log("File is uploded on Cloudnary: ", response.url);
         fs.unlinkSync(filepath);
 
