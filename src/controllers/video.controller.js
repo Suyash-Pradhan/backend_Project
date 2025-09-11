@@ -26,7 +26,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
     if (!thumbnailFile) {
         throw new ApiError(400, 'Thumbnail is required')
     }
-// console.log("info",videoFile, thumbnailFile)
+    // console.log("info",videoFile, thumbnailFile)
     const CloudnaryLinkVideo = await UplodeonCloudnary(videoFile)
     const CloudnaryLinkThumbnail = await UplodeonCloudnary(thumbnailFile)
 
@@ -52,12 +52,55 @@ const publishAVideo = asyncHandler(async (req, res) => {
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: get video by id
+    if (!videoId) {
+        throw new ApiError(400, 'video id is required')
+    }
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, 'Invalid video id')
+    }
+    const video = await Video.findById(videoId)
+    if (!video) {
+        throw new ApiError(404, 'Video not found')
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, video, 'Video fetched successfully'))
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
+    // update video details like title, description, thumbnail
     const { videoId } = req.params
-    //TODO: update video details like title, description, thumbnail
+    const { title, description } = req.body
+    if (!videoId) {
+        throw new ApiError(400, 'video id is required')
+    }
+    if (!title && !description && !req.file) {
+        throw new ApiError(400, 'At least one field is required to update')
+    }
 
+    const thumbnailFile = req.file.path
+    // console.log("thumbnailFile", thumbnailFile)
+
+    const CloudnaryLinkThumbnail = await UplodeonCloudnary(thumbnailFile)
+
+    const uplodFiles = {}
+    if (thumbnailFile) uplodFiles.thumbnail = CloudnaryLinkThumbnail.secure_url
+    if (title) uplodFiles.title = title
+    if (description) uplodFiles.desc = description
+
+    const video = await Video.findByIdAndUpdate(videoId, {
+        $set: uplodFiles
+    }, { new: true })
+
+
+
+    if (!video) {
+        throw new ApiError(404, 'Video not found')
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, video, 'Video updated successfully'))
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {

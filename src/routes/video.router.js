@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import {
-    publishAVideo
+    publishAVideo,getVideoById,updateVideo,getAllVideos,deleteVideo,togglePublishStatus
 } from '../controllers/video.controller.js'
 import { upload } from '../middlewares/multer.middleware.js'
 import { verifyToken } from '../middlewares/auth.middleware.js'
@@ -16,5 +16,9 @@ router.route('/uplode-video').post(verifyToken, upload.fields([
         count:1
     }
 ]), publishAVideo)
+
+router.route('/:videoId').get(verifyToken, getVideoById)
+router.route('/:videoId').patch(verifyToken,upload.single('thumbnail'), updateVideo)
+router.route('/').get(verifyToken, getAllVideos)
 
 export default router
