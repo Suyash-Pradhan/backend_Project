@@ -21,7 +21,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     } else {
         sortbycondition[createdAt] = -1
     }
-    const video = Video.find(querycondition)
+    const video = await Video.find(querycondition)
         .sort(sortbycondition)
         .skip(parseInt(page - 1) * parseInt(limit))
         .limit(parseInt(limit))
