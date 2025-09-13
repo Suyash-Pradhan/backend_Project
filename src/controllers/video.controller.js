@@ -11,7 +11,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
     //  get all videos based on query, sort, pagination
 
-    const querycondition = {}
+    const querycondition = {isPublished: true}
     if (query) {
         querycondition.title = { $regex: query, $options: 'i' }
     }
@@ -77,7 +77,10 @@ const getVideoById = asyncHandler(async (req, res) => {
     if (!isValidObjectId(videoId)) {
         throw new ApiError(400, 'Invalid video id')
     }
-    const video = await Video.findById(videoId)
+    const video = await Video.findOne({
+        _id:videoId,
+        isPublished:true
+    })
     if (!video) {
         throw new ApiError(404, 'Video not found')
     }
@@ -136,6 +139,19 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
     const { videoId } = req.params
+    const video = await Video.findOne({
+        _id: videoId,
+        owner: req.user?._id
+    })
+
+    if (!video) {
+        throw new ApiError(403, 'You are not authorized to update this video')
+    }
+    video.isPublished = !video.isPublished
+    await video.save()
+
+    return res.status(200).json(new ApiResponse(200, video, 'Video publish status updated successfully'))
+
 })
 
 export {
