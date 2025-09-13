@@ -9,7 +9,29 @@ import UplodeonCloudnary from "../utils/cloudnarry.js"
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
-    //TODO: get all videos based on query, sort, pagination
+    //  get all videos based on query, sort, pagination
+
+    const querycondition = {}
+    if (query) {
+        querycondition.title = { $regex: query, $options: 'i' }
+    }
+    const sortbycondition = {}
+    if (sortBy) {
+        sortbycondition[sortBy] = sortBy === 'asc' ? -1 : 1
+    } else {
+        sortbycondition[createdAt] = -1
+    }
+    const video = Video.find(querycondition)
+        .sort(sortbycondition)
+        .skip(parseInt(page - 1) * parseInt(limit))
+        .limit(parseInt(limit))
+
+    if (!video) {
+        throw new ApiError(404, 'Video not found')
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200, video, 'Videos fetched successfully'))
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
