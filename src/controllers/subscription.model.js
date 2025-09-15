@@ -38,12 +38,13 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     if (!channelId) {
         throw new ApiError(400, "channelId is required")
     }
+console.log("channelId", channelId);
 
     const subscribers = await Subscription.aggregate([
         { $match: { channel: new mongoose.Types.ObjectId(channelId) } },
         {
             $lookup: {
-                from: 'user',
+                from: 'users',
                 localField: 'subscriber',
                 foreignField: '_id',
                 as: 'subscriber'

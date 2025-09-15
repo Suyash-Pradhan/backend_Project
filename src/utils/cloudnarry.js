@@ -36,7 +36,7 @@ const UplodeonCloudnary = async (filepath) => {
             };
         })
 
-        console.log("video ke length duration", response);
+        // console.log("video ke length duration", response);
 
 
         // console.log("File is uploded on Cloudnary: ", response.url);
