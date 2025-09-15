@@ -38,7 +38,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     if (!channelId) {
         throw new ApiError(400, "channelId is required")
     }
-console.log("channelId", channelId);
+    console.log("channelId", channelId);
 
     const subscribers = await Subscription.aggregate([
         { $match: { channel: new mongoose.Types.ObjectId(channelId) } },
@@ -55,6 +55,16 @@ console.log("channelId", channelId);
             $unwind: '$subscriber'
         },
         { $sort: { 'subscriber.createdAt': -1 } },
+         {
+            $project: {
+                '_id': 1,
+                'subscriber._id': 1,
+                'subscriber.username': 1,
+                'subscriber.avatar': 1,
+                'createdAt': 1
+
+            }
+        }
 
 
 
@@ -76,7 +86,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
         },
         {
             $lookup: {
-                from: 'user',
+                from: 'users',
                 localField: 'channel',
                 foreignField: '_id',
                 as: 'channel'
@@ -87,6 +97,16 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
         },
         {
             $sort: { 'channel.createdAt': -1 }
+        },
+        {
+            $project: {
+                '_id': 1,
+                'channel._id': 1,
+                'channel.username': 1,
+                'channel.avatar': 1,
+
+                
+            }
         }
     ])
     return res.status(200).json(new ApiResponse(200, subscribedChannels, "subscribed channels list"))
