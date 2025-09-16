@@ -7,6 +7,6 @@ import {
 } from '../controllers/dashboard.controller.js'
 
 router.route('/channel-stats/:channelId').get(verifyToken, getChannelStats)
-// router.route('/channel-videos/:channelId').get(verifyToken, getChannelVideos)
+router.route('/channel-videos/:channelId').get(verifyToken, getChannelVideos)
 
 export default router
