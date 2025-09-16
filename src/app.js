@@ -6,6 +6,7 @@ import videoRouter from './routes/video.router.js';
 import subscriptionRouter from './routes/subscription.router.js';
 import dashboardRouter from './routes/dashboard.router.js';
 import likeRouter from './routes/like.router.js';
+import healtcheckRouter from './routes/healthcheck.router.js';
 
 const app = express();
 app.use(cors({
@@ -24,5 +25,6 @@ app.use('/api/v1/user',videoRouter);
 app.use('/api/v1/user',subscriptionRouter); 
 app.use('/api/v1/user',dashboardRouter); 
 app.use('/api/v1/user',likeRouter); 
+app.use('/api/v1/user',healtcheckRouter); 
 
 export {app};
