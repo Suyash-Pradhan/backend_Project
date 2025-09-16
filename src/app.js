@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import userRouter from './routes/user.router.js';
 import videoRouter from './routes/video.router.js';
 import subscriptionRouter from './routes/subscription.router.js';
+import dashboardRouter from './routes/dashboard.router.js';
 
 const app = express();
 app.use(cors({
@@ -20,5 +21,6 @@ app.use(cookieParser());
 app.use('/api/v1/user',userRouter); 
 app.use('/api/v1/user',videoRouter); 
 app.use('/api/v1/user',subscriptionRouter); 
+app.use('/api/v1/user',dashboardRouter); 
 
 export {app};

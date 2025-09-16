@@ -11,7 +11,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
     //  get all videos based on query, sort, pagination
 
-    const querycondition = {isPublished: true}
+    const querycondition = { isPublished: true }
     if (query) {
         querycondition.title = { $regex: query, $options: 'i' }
     }
@@ -78,8 +78,8 @@ const getVideoById = asyncHandler(async (req, res) => {
         throw new ApiError(400, 'Invalid video id')
     }
     const video = await Video.findOne({
-        _id:videoId,
-        isPublished:true
+        _id: videoId,
+        isPublished: true
     })
     if (!video) {
         throw new ApiError(404, 'Video not found')
@@ -153,6 +153,24 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, video, 'Video publish status updated successfully'))
 
 })
+const recordView = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+    if (!videoId) {
+        throw new ApiError(400, "videoId is required")
+    }
+
+    const video = await Video.updateOne({
+        _id: videoId,
+        isPublished: true
+    }, {
+        $inc: { views: 1 }
+    })
+
+    if(!video.matchedCount){
+        throw new ApiError(404, "video not found")
+    }
+    return res.status(200).json(new ApiResponse(200, null, "view recorded successfully"))
+})
 
 export {
     getAllVideos,
@@ -160,5 +178,6 @@ export {
     getVideoById,
     updateVideo,
     deleteVideo,
-    togglePublishStatus
+    togglePublishStatus,
+    recordView
 }
