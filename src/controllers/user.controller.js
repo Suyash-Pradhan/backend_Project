@@ -49,8 +49,8 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "User already exists with this email or username")
     }
 
-    const avtarlocal = req.files?.avatar[0]?.path
-    const coverImagelocal = req.files?.coverImage[0]?.path
+    const avtarlocal = req.files?.avatar?.[0]?.path
+    const coverImagelocal = req.files?.coverImage?.[0]?.path
 
     if (!avtarlocal) {
         throw new ApiError(400, "Avatar is required")
@@ -119,7 +119,7 @@ const loginUser = asyncHandler(async (req, res) => {
     const { acesstoken, refreshtoken } = await generateAccessAndRefreshToken(user._id)
     const loginduser = await User.findById(user._id).select('-password -refreshToken')
     const option = {
-        httponly: true,
+        httpOnly: true,
         secure: true
     }
 
@@ -128,7 +128,7 @@ const loginUser = asyncHandler(async (req, res) => {
         .cookie("accessToken", acesstoken, option)
         .json(new ApiResponse(200,
             {
-                user: loginduser, acesstoken, refreshtoken
+                user: loginduser, accessToken: acesstoken, refreshToken: refreshtoken
             }
         ))
 })

@@ -19,7 +19,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     if (sortBy) {
         sortbycondition[sortBy] = sortBy === 'asc' ? -1 : 1
     } else {
-        sortbycondition[createdAt] = -1
+        sortbycondition['createdAt'] = -1
     }
     const video = await Video.find(querycondition)
         .sort(sortbycondition)
