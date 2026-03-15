@@ -6,27 +6,29 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 
 
 const toggleSubscription = asyncHandler(async (req, res) => {
+const toggleSubscription = asyncHandler(async (req, res) => {
     const { channelId } = req.params
     if (!channelId) {
         throw new ApiError(400, "channelId is required")
     }
-    // TODO: toggle subscription
-    const existingSubscription = await Subscription.findOne({
-        channel: channelId,
-        subscriber: req.user._id
-    })
-    if (!existingSubscription) {
-        const newSubscription = await Subscription.create({
-            channel: channelId,
-            subscriber: req.user._id
-        })
-        return res.status(201).json(new ApiResponse(201, newSubscription, "subscribed successfully"))
+    if (!mongoose.Types.ObjectId.isValid(channelId)) {
+        throw new ApiError(400, "Invalid channelId format")
     }
-    const subs = await Subscription.deleteOne({
-        channel: channelId,
+    const channelObjectId = new mongoose.Types.ObjectId(channelId)
+
+    const removedSubscription = await Subscription.findOneAndDelete({
+        channel: channelObjectId,
         subscriber: req.user._id
     })
-    return res.status(200).json(new ApiResponse(200, subs, "unsubscribed successfully"))
+    if (removedSubscription) {
+        return res.status(200).json(new ApiResponse(200, removedSubscription, "unsubscribed successfully"))
+    }
+
+    const newSubscription = await Subscription.create({
+        channel: channelObjectId,
+        subscriber: req.user._id
+    })
+    return res.status(201).json(new ApiResponse(201, newSubscription, "subscribed successfully"))
 
 })
 
