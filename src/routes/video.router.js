@@ -8,9 +8,9 @@ const router = Router()
 
 // Public routes
 router.route('/').get(getAllVideos)
-router.route('/:videoId').get(getVideoById)
-router.route('/view/:videoId').post(recordView)
 router.route('/mine').get(verifyToken, getMyVideos)
+router.route('/view/:videoId').post(recordView)
+router.route('/:videoId').get(getVideoById)
 
 // Protected routes
 router.route('/').post(verifyToken, upload.fields([
