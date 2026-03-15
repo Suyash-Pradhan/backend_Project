@@ -38,6 +38,10 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
         throw new ApiError(400, "channelId is required")
     }
 
+    if (!mongoose.Types.ObjectId.isValid(channelId)) {
+        throw new ApiError(400, "Invalid channelId format")
+    }
+
     const subscribers = await Subscription.aggregate([
         { $match: { channel: new mongoose.Types.ObjectId(channelId) } },
         {
