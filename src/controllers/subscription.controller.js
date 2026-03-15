@@ -58,7 +58,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
         {
             $unwind: '$subscriber'
         },
-        { $sort: { 'subscriber.createdAt': -1 } },
+        { $sort: { 'createdAt': -1 } },
         {
             $project: {
                 '_id': 1,
