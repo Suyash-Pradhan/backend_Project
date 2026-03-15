@@ -7,6 +7,9 @@ import subscriptionRouter from './routes/subscription.router.js';
 import dashboardRouter from './routes/dashboard.router.js';
 import likeRouter from './routes/like.router.js';
 import healtcheckRouter from './routes/healthcheck.router.js';
+import commentRouter from './routes/comment.router.js';
+import playlistRouter from './routes/playlist.router.js';
+import tweetRouter from './routes/tweet.router.js';
 
 const app = express();
 app.use(cors({
@@ -20,11 +23,14 @@ app.use(cookieParser());
 
 //router called
 
-app.use('/api/v1/user',userRouter); 
-app.use('/api/v1/user',videoRouter); 
-app.use('/api/v1/user',subscriptionRouter); 
-app.use('/api/v1/user',dashboardRouter); 
-app.use('/api/v1/user',likeRouter); 
-app.use('/api/v1/user',healtcheckRouter); 
+app.use('/api/v1/users',userRouter); 
+app.use('/api/v1/videos',videoRouter); 
+app.use('/api/v1/subscriptions',subscriptionRouter); 
+app.use('/api/v1/dashboard',dashboardRouter); 
+app.use('/api/v1/likes',likeRouter); 
+app.use('/api/v1/comments',commentRouter);
+app.use('/api/v1/playlist',playlistRouter);
+app.use('/api/v1/tweets',tweetRouter);
+app.use('/api/v1/healthcheck',healtcheckRouter); 
 
 export {app};

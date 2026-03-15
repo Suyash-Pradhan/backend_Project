@@ -2,7 +2,7 @@ import {app} from './app.js'
 import connectDB from "./db/index.js";
 import Dotenv from "dotenv";
 
-Dotenv.config({path: './env'})
+Dotenv.config({path: './.env'})
 
 connectDB().then(()=>{app.listen(process.env.PORT,()=>{
     console.log(`Server is listening at post: ${process.env.PORT}`);

@@ -1,10 +1,9 @@
-
+import mongoose from "mongoose"
 import { Comment } from "../models/comment.model.js"
+import { Video } from "../models/video.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
-import { User } from "../models/user.model.js"
-import { parse } from "dotenv"
 
 const getVideoComments = asyncHandler(async (req, res) => {
     // get all comments for a video
@@ -51,7 +50,7 @@ const addComment = asyncHandler(async (req, res) => {
     if (!content) {
         throw new ApiError(400, 'Content is required')
     }
-    const video = await User.findById(videoId)
+    const video = await Video.findById(videoId)
     if (!video) {
         throw new ApiError(404, 'Video not found')
     }
@@ -61,7 +60,11 @@ const addComment = asyncHandler(async (req, res) => {
         video: videoId
 
     })
-    return res.status(201).json(new ApiResponse(201, Comment, 'Comment added successfully'))
+    
+    // Populate owner info before returning
+    await comment.populate('owner', 'username fullname avatar')
+    
+    return res.status(201).json(new ApiResponse(201, comment, 'Comment added successfully'))
 })
 
 const updateComment = asyncHandler(async (req, res) => {

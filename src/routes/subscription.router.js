@@ -4,11 +4,12 @@ import {
     toggleSubscription,
     getUserChannelSubscribers,
     getSubscribedChannels
-} from '../controllers/subscription.model.js';
+} from '../controllers/subscription.controller.js';
 
 const router = express.Router();
 
-router.route('/toggle-subscription/:channelId').post(verifyToken, toggleSubscription);
-router.route('/subscribers/:channelId').get(verifyToken, getUserChannelSubscribers);
-router.route('/subscribed-channels/:subscriberId').get(verifyToken, getSubscribedChannels);
+// Match frontend API calls
+router.route('/c/:channelId').post(verifyToken, toggleSubscription);
+router.route('/c/:channelId').get(verifyToken, getUserChannelSubscribers);
+router.route('/u/:subscriberId').get(verifyToken, getSubscribedChannels);
 export default router;
