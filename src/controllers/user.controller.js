@@ -10,11 +10,6 @@ const COOKIE_OPTIONS = {
 
 const registerUser = asyncHandler(async (req, res) => {
     const { fullName, username, email, password } = req.body;
-    
-    // Manual validation until Phase 3 (Zod middleware)
-    if ([fullName, username, email, password].some((field) => field?.trim() === "")) {
-        throw new ApiError(400, "All fields are required");
-    }
 
     const avatarLocalPath = req.files?.avatar?.[0]?.path;
     const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
@@ -37,10 +32,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
 const loginUser = asyncHandler(async (req, res) => {
     const { username, email, password } = req.body;
-
-    if (!(email || username) || !password) {
-        throw new ApiError(400, "Email/Username and password are required");
-    }
 
     const { loggedInUser, accessToken, refreshToken } = await userService.loginUser({ username, email, password });
 
@@ -76,10 +67,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword } = req.body;
-    
-    if (!oldPassword || !newPassword) {
-        throw new ApiError(400, "Both old and new passwords are required");
-    }
 
     await userService.changePassword(req.user._id, oldPassword, newPassword);
 
@@ -88,10 +75,6 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
     const { fullName, email } = req.body;
-    
-    if (!fullName || !email) {
-        throw new ApiError(400, "Full name and email are required");
-    }
 
     const updatedUser = await userService.updateUserDetails(req.user._id, { fullName, email });
 

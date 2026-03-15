@@ -37,6 +37,11 @@ const videoSchema = new mongoose.Schema({
     }
 }, {timestamps: true})
 
+// Performance Indexes for querying videos efficiently
+videoSchema.index({ owner: 1, createdAt: -1 });  // Fetches a user's videos fast
+videoSchema.index({ isPublished: 1, createdAt: -1 }); // Fetches the feed fast
+videoSchema.index({ title: 'text', desc: 'text' }); // Enables rapid search
+
 videoSchema.plugin(mongooseAggregatePaginate)
 
 

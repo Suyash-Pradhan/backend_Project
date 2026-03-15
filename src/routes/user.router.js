@@ -1,23 +1,32 @@
 import { Router } from 'express';
 import {
-    registerUser,
     loginUser,
     logoutuser,
+    registerUser,
     refreshacessToken,
     chnagePassword,
+    getcurrentuser,
     chnageuserDetails,
     changeAvatar,
     changeCoverImage,
-    getcurrentuser,
     getchannelDetails,
-    getWatchHistory,
-} from '../controllers/user.controller.js';
-import { upload } from '../middlewares/multer.middleware.js';
-import { verifyToken } from '../middlewares/auth.middleware.js';
+    getWatchHistory
 
-const router = Router();
+} from "../controllers/user.controller.js";
+import { upload } from "../middlewares/multer.middleware.js"
 
-router.route('/register').post(
+import { verifyToken } from "../middlewares/auth.middleware.js"
+import { validate } from "../middlewares/validate.middleware.js";
+import {
+    registerUserSchema,
+    loginUserSchema,
+    changePasswordSchema,
+    updateAccountSchema
+} from "../validators/user.validator.js";
+
+const router = Router()
+
+router.route("/register").post(
     upload.fields([
         {
             name: 'avatar',
