@@ -9,6 +9,10 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 const createPlaylist = asyncHandler(async (req, res) => {
     const { name, description } = req.body
 
+    if (!name) {
+        throw new ApiError(400, "name is required")
+    }
+
     const playlist = await Playlist.create({
         name,
         description,
@@ -25,13 +29,9 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
     if (!userId) {
         throw new ApiError(400, "userId is required")
     }
-    //TODO: get user playlists
     const userPlaylist = await Playlist.find({ owner: userId })
         .populate('videos')
         .populate('owner', 'username ')
-    if (!userPlaylist) {
-        throw new ApiError(404, "playlist not found")
-    }
     return res.status(200).json(new ApiResponse(200, userPlaylist, "user playlists fetched successfully"))
 })
 
@@ -42,6 +42,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
         .populate('videos')
         .populate('owner', 'username')
 
+    // returning empty array keeps consumer simple; 404 only if playlist missing
     if (!playlist) {
         throw new ApiError(404, "playlist not found")
     }
@@ -115,7 +116,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
         owner: req.user._id
     })
 
-    if (!playlist.matchedcount) {
+    if (!playlist.deletedCount) {
         throw new ApiError(404, "playlist or video not found or you are not authorized to delete this playlist")
     }
     return res.status(200).json(new ApiResponse(200, null, "playlist deleted successfully"))

@@ -18,7 +18,7 @@ export const verifyToken = asyncHandler(async (req, res, next) => {
         req.user = user
         next()
     } catch (error) {
-        console.log("tera dhyan kidhar h ke tera error edhar h", error);
-        throw new ApiError(401, "Not authorized , token failed")
+        console.error("Token verification failed:", error);
+        throw new ApiError(401, "Not authorized, token failed")
     }
 })

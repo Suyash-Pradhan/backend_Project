@@ -1,10 +1,11 @@
 import mongoose, { isValidObjectId } from "mongoose"
 import { Video } from "../models/video.model.js"
 import { User } from "../models/user.model.js"
+import { Like } from "../models/like.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
-import UplodeonCloudnary from "../utils/cloudnarry.js"
+import uploadOnCloudinary from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -15,23 +16,51 @@ const getAllVideos = asyncHandler(async (req, res) => {
     if (query) {
         querycondition.title = { $regex: query, $options: 'i' }
     }
+    if (userId && isValidObjectId(userId)) {
+        querycondition.owner = userId
+    }
+    
     const sortbycondition = {}
     if (sortBy) {
-        sortbycondition[sortBy] = sortBy === 'asc' ? -1 : 1
+        sortbycondition[sortBy] = sortType === 'asc' ? 1 : -1
     } else {
         sortbycondition['createdAt'] = -1
     }
-    const video = await Video.find(querycondition)
+    
+    const videos = await Video.find(querycondition)
+        .populate('owner', 'username fullname avatar')
         .sort(sortbycondition)
         .skip(parseInt(page - 1) * parseInt(limit))
         .limit(parseInt(limit))
 
-    if (!video) {
-        throw new ApiError(404, 'Video not found')
-    }
+    const totalVideos = await Video.countDocuments(querycondition)
+
     return res
         .status(200)
-        .json(new ApiResponse(200, video, 'Videos fetched successfully'))
+        .json(new ApiResponse(200, {
+            videos,
+            totalVideos,
+            totalPages: Math.ceil(totalVideos / limit),
+            currentPage: parseInt(page)
+        }, 'Videos fetched successfully'))
+})
+
+const getMyVideos = asyncHandler(async (req, res) => {
+    // return all videos for the logged-in user, published or not
+    const { page = 1, limit = 20 } = req.query
+    const videos = await Video.find({ owner: req.user._id })
+        .sort({ createdAt: -1 })
+        .skip((parseInt(page) - 1) * parseInt(limit))
+        .limit(parseInt(limit))
+
+    const totalVideos = await Video.countDocuments({ owner: req.user._id })
+
+    return res.status(200).json(new ApiResponse(200, {
+        videos,
+        totalVideos,
+        totalPages: Math.ceil(totalVideos / limit),
+        currentPage: parseInt(page)
+    }, 'Your videos fetched successfully'))
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
@@ -80,14 +109,22 @@ const getVideoById = asyncHandler(async (req, res) => {
     const video = await Video.findOne({
         _id: videoId,
         isPublished: true
-    })
+    }).populate('owner', 'username fullname avatar')
+    
     if (!video) {
         throw new ApiError(404, 'Video not found')
     }
 
+    const likesCount = await Like.countDocuments({ video: videoId })
+
+    const payload = {
+        ...video.toObject(),
+        likesCount
+    }
+
     return res
         .status(200)
-        .json(new ApiResponse(200, video, 'Video fetched successfully'))
+        .json(new ApiResponse(200, payload, 'Video fetched successfully'))
 })
 
 const updateVideo = asyncHandler(async (req, res) => {
@@ -174,6 +211,7 @@ const recordView = asyncHandler(async (req, res) => {
 
 export {
     getAllVideos,
+    getMyVideos,
     publishAVideo,
     getVideoById,
     updateVideo,

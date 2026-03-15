@@ -19,7 +19,7 @@ const createTweet = asyncHandler(async (req, res) => {
         throw new ApiError(500, "tweet not created")
     }
     return res
-        .staus(201)
+        .status(201)
         .json(new ApiResponse(201, tweet, "tweet created successfully"))
     //TODO: create tweet
 })
@@ -68,6 +68,8 @@ const deleteTweet = asyncHandler(async (req, res) => {
     if (!tweet.deletedCount) {
         throw new ApiError(404, "tweet not found or you are not the owner")
     }
+
+    return res.status(200).json(new ApiResponse(200, null, "tweet deleted successfully"))
 })
 
 export {

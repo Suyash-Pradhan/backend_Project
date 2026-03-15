@@ -9,7 +9,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        lowecase: true,
+        lowercase: true,
         trim: true,
         index: true //to make serchable - so that it can come in DB search
     },
@@ -41,7 +41,7 @@ const UserSchema = new mongoose.Schema({
         }],
     password: {
         type: String,
-        required: [true, 'password zaruri hai']
+        required: [true, 'Password is required']
     },
     refreshToken: {
         type: String,
@@ -69,7 +69,7 @@ UserSchema.methods.generateAccessToken = function () {
             email: this.email
         },
         process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIARY
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRY
     }
     )
 }
@@ -80,7 +80,7 @@ UserSchema.methods.generateRefreshToken = function () {
 
         },
         process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIARY
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRY
     }
     )
 }

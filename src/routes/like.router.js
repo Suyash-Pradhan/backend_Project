@@ -8,9 +8,10 @@ import {verifyToken} from '../middlewares/auth.middleware.js'
 
 const router = express.Router()
 
-router.route('/like-video/:videoId').post(verifyToken, toggleVideoLike)
-router.route('/like-comment/:commentId').post(verifyToken, toggleCommentLike)
-router.route('/like-tweet/:tweetId').post(verifyToken, toggleTweetLike)
-router.route('/all-liked-videos').get(verifyToken, getLikedVideos)
+// Match frontend API calls
+router.route('/toggle/v/:videoId').post(verifyToken, toggleVideoLike)
+router.route('/toggle/c/:commentId').post(verifyToken, toggleCommentLike)
+router.route('/toggle/t/:tweetId').post(verifyToken, toggleTweetLike)
+router.route('/videos').get(verifyToken, getLikedVideos)
 
 export default router
