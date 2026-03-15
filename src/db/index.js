@@ -4,7 +4,8 @@ import { DB_NAME } from "../constants.js";
 const connectDB = async()=>{
     try{
        console.log("🔄 Attempting to connect to MongoDB...")
-       console.log(`Connection URL: ${process.env.MONGO_URL}/${DB_NAME}`)
+       // Log only the database name to avoid exposing credentials
+       console.log(`Database: ${DB_NAME}`)
        
        const connectionInstance = await mongoose.connect(`${process.env.MONGO_URL}/${DB_NAME}`, {
            serverSelectionTimeoutMS: 10000,
