@@ -10,7 +10,8 @@ export const validate = (schema) => async (req, res, next) => {
         next();
     } catch (error) {
         // Extract Zod error messages
-        const errorMessages = error.errors.map((err) => err.message).join(", ");
-        next(new ApiError(400, `Validation Error: ${errorMessages}`, error.errors));
+        const errorMessages = error.issues.map((issue) => issue.message).join(", ");
+        next(new ApiError(400, `Validation Error: ${errorMessages}`, error.issues));
+    }
     }
 };
