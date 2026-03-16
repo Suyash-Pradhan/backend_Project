@@ -1,18 +1,20 @@
-import express from 'express'
+import { Router } from 'express';
 import {
-    getVideoComments,
     addComment,
+    deleteComment,
+    getVideoComments,
     updateComment,
-    deleteComment
-} from '../controllers/comment.controller.js'
-import { verifyToken } from '../middlewares/auth.middleware.js'
+} from "../controllers/comment.controller.js"
+import {verifyToken} from "../middlewares/auth.middleware.js"
 
-const router = express.Router()
+import { validate } from "../middlewares/validate.middleware.js";
+import { commentSchema } from "../validators/comment.validator.js";
+
+const router = Router();
+router.use(verifyToken);
 
 // Match frontend API calls: /api/v1/comments/:videoId
-router.route('/:videoId').get(getVideoComments)
-router.route('/:videoId').post(verifyToken, addComment)
-router.route('/c/:commentId').patch(verifyToken, updateComment)
-router.route('/c/:commentId').delete(verifyToken, deleteComment)
+router.route("/:videoId").get(getVideoComments).post(validate(commentSchema), addComment);
+router.route("/c/:commentId").delete(deleteComment).patch(validate(commentSchema), updateComment);
 
 export default router

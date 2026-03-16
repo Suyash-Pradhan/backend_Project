@@ -9,6 +9,8 @@ import {
   updatePlaylist
 } from "../controllers/playlist.controller.js"
 import { verifyToken } from "../middlewares/auth.middleware.js"
+import { validate } from "../middlewares/validate.middleware.js";
+import { playlistSchema } from "../validators/playlist.validator.js";
 
 const router = Router()
 
@@ -19,8 +21,8 @@ router.route("/remove/:videoId/:playlistId").patch(verifyToken, removeVideoFromP
 router.route("/:playlistId").get(getPlaylistById)
 
 // protected writes
-router.route("/").post(verifyToken, createPlaylist)
-router.route("/:playlistId").patch(verifyToken, updatePlaylist)
+router.route("/").post(verifyToken, validate(playlistSchema), createPlaylist)
+router.route("/:playlistId").patch(verifyToken, validate(playlistSchema), updatePlaylist)
 router.route("/:playlistId").delete(verifyToken, deletePlaylist)
 
 export default router
