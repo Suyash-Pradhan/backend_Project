@@ -6,6 +6,7 @@ import {
     publishAVideo,
     togglePublishStatus,
     updateVideo,
+    recordView,getMyVideos
 } from "../controllers/video.controller.js"
 import {verifyToken} from "../middlewares/auth.middleware.js"
 import {upload} from "../middlewares/multer.middleware.js"

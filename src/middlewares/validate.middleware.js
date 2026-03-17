@@ -13,5 +13,4 @@ export const validate = (schema) => async (req, res, next) => {
         const errorMessages = error.issues.map((issue) => issue.message).join(", ");
         next(new ApiError(400, `Validation Error: ${errorMessages}`, error.issues));
     }
-    }
-};
+}

@@ -15,4 +15,4 @@ export const updateVideoSchema = z.object({
         message: "At least one field (title or description) is required to update"
     })
 });
-});
+
